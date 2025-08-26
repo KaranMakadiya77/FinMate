@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response, RequestHandler } from "express";
+import { IRequest } from "../Types/IRequest.types";
 
 type AsyncRequestHandler = (
-    req: Request,
+    req: IRequest,
     res: Response,
     next: NextFunction
 ) => Promise<unknown>;
