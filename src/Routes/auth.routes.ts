@@ -32,9 +32,7 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.use(verifyJWT);
 
 // change password
-router
-    .route("/changepassword")
-    .patch(validate(changepasswordValidationSchema), changePassword);
+router.route("/changepassword").patch(validate(changepasswordValidationSchema), changePassword);
 
 // logout
 router.route("/logout").post(logoutUser);

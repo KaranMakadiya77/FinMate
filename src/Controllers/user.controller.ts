@@ -5,9 +5,7 @@ import { ApiResponse } from "../Utils/apiResponse";
 
 // get user details
 const getUser = asyncHandler(async (req, res) => {
-    return res
-        .status(200)
-        .json(new ApiResponse(200, req.user, "User fetched sucessfully"));
+    return res.status(200).json(new ApiResponse(200, req.user, "User fetched sucessfully"));
 });
 
 // update user details
@@ -18,28 +16,18 @@ const updateUser = asyncHandler(async (req, res) => {
     }).select("-password -refreshToken -otp -otp_expiry");
 
     //  RETURN THE RESPONSE
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(200, user, "Account details updated sucessfully")
-        );
+    return res.status(200).json(new ApiResponse(200, user, "Account details updated sucessfully"));
 });
 
 // update user details
 const updateUserBalance = asyncHandler(async (req, res) => {
     // FIND THE USER BY THE USER ID AND UPDATE THE INFORMATION
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        { wallet_balance: req.body.amount },
-        { new: true }
-    ).select("-password -refreshToken -otp -otp_expiry");
+    const user = await User.findByIdAndUpdate(req.user?._id, { wallet_balance: req.body.amount }, { new: true }).select(
+        "-password -refreshToken -otp -otp_expiry"
+    );
 
     //  RETURN THE RESPONSE
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(200, user, "Account details updated sucessfully")
-        );
+    return res.status(200).json(new ApiResponse(200, user, "Account details updated sucessfully"));
 });
 
 // delete user
@@ -51,9 +39,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     if (!deletedUser) throw new ApiError(404, "User not found !!");
 
     // return response
-    return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "User deleted sucessfully !!"));
+    return res.status(200).json(new ApiResponse(200, {}, "User deleted sucessfully !!"));
 });
 
 export { getUser, updateUser, updateUserBalance, deleteUser };

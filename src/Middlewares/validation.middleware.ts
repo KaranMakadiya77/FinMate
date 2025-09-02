@@ -13,9 +13,7 @@ const validate = (schema: Schema) => {
         const { error } = schema.validate(req.body, { abortEarly: false });
 
         if (error) {
-            const validationErrors = error.details.map(
-                (detail: any) => detail.message
-            );
+            const validationErrors = error.details.map((detail: any) => detail.message);
 
             throw new ApiError(400, "Bad Request", validationErrors);
         }

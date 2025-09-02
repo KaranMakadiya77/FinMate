@@ -23,9 +23,13 @@ export interface IUser {
 export interface IUserMethods {
     isPasswordCorrect(password: string): Promise<boolean>;
     isOtpCorrect(otp: string): Promise<boolean>;
+    updateBalance(amount: number, type: "income" | "expense"): void;
     generateAccessToken(): string;
     generateRefreshToken(): string;
-    generateAccessAndRefreshTokens(): Promise<{ accessToken: string; refreshToken: string }>;
+    generateAccessAndRefreshTokens(): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }>;
 }
 
 export type IUserDocument = Document & IUser & IUserMethods;
