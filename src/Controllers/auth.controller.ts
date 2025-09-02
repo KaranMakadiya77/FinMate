@@ -21,17 +21,13 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create(req.body);
 
     // GET THE CREATED USER WITHOUT THE PASSWORD AND REFERESH FIELDS AND THROW ERROR IF USER DOES NOT EXISTS
-    const createduser = await User.findById(user._id).select(
-        "-password -refreshToken -otp -otp_expiry -__v"
-    );
+    const createduser = await User.findById(user._id).select("-password -refreshToken -otp -otp_expiry -__v");
 
     // throw error if user is not created
     if (!createduser) throw new ApiError(500, "Internal server error");
 
     // return response
-    return res
-        .status(201)
-        .json(new ApiResponse(201, createduser, "User created successfully"));
+    return res.status(201).json(new ApiResponse(201, createduser, "User created successfully"));
 });
 
 // login
@@ -42,26 +38,19 @@ const loginUser = asyncHandler(async (req, res) => {
     });
 
     // throw error if user deos not exists
-    if (!user)
-        throw new ApiError(404, "User not found", [
-            `Email ${req.body.email} not found`,
-        ]);
+    if (!user) throw new ApiError(404, "User not found", [`Email ${req.body.email} not found`]);
 
     // check wheather the password is valid or not
     const isPasswordCorrect = await user.isPasswordCorrect(req.body.password);
 
     // throw error is password is invalid
-    if (!isPasswordCorrect)
-        throw new ApiError(401, "Invalid Password !!!", ["Invalid password"]);
+    if (!isPasswordCorrect) throw new ApiError(401, "Invalid Password !!!", ["Invalid password"]);
 
     // generate tokens
-    const { accessToken, refreshToken } =
-        await user.generateAccessAndRefreshTokens();
+    const { accessToken, refreshToken } = await user.generateAccessAndRefreshTokens();
 
     // fetch logged in user
-    const loggedinUser = await User.findById(user._id).select(
-        "-password -refreshToken -otp -otp_expiry -__v"
-    );
+    const loggedinUser = await User.findById(user._id).select("-password -refreshToken -otp -otp_expiry -__v");
 
     // return response
     return res
@@ -84,17 +73,13 @@ const loginUser = asyncHandler(async (req, res) => {
 // refresh accesstoken
 const refreshAccessToken = asyncHandler(async (req, res) => {
     // GET THE TOKEN FROM COOKIES OR REQUEST BODY
-    const incomingRefreshToken =
-        req.cookies.refreshToken || req.body.refreshToken;
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     //  THROW ERROR IF THERE ARE NO TOKENS
     if (!incomingRefreshToken) throw new ApiError(401, "Unauthorized Request");
 
     //  VERIFY THE TOKEN
-    const decodedToken = jwt.verify(
-        incomingRefreshToken,
-        process.env.REFRESH_TOKEN_SECRET ?? ""
-    ) as Token;
+    const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET ?? "") as Token;
 
     // GET THE USER FROM THE DATABASE
     const user: IUserDocument | null = await User.findById(decodedToken._id);
@@ -103,21 +88,14 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     if (!user) throw new ApiError(401, "Invalid Referesh token");
 
     // GENERATE NEW ACCESSTOKEN AND REFRESHTOKEN
-    const { accessToken, refreshToken } =
-        await user.generateAccessAndRefreshTokens();
+    const { accessToken, refreshToken } = await user.generateAccessAndRefreshTokens();
 
     // Return Response
     return res
         .status(200)
         .cookie("accessToken", accessToken, cookieOption)
         .cookie("refreshToken", refreshToken, cookieOption)
-        .json(
-            new ApiResponse(
-                200,
-                { accessToken, refreshToken },
-                "Token refereshed generated sucessfully"
-            )
-        );
+        .json(new ApiResponse(200, { accessToken, refreshToken }, "Token refereshed generated sucessfully"));
 });
 
 // change password
@@ -135,19 +113,14 @@ const changePassword = asyncHandler(async (req, res) => {
     const isPasswordValid = await user.isPasswordCorrect(oldPassword);
 
     // IF OLD PASSWORD IS NOT VALID THEN THROW NEW ERROR
-    if (!isPasswordValid)
-        throw new ApiError(400, "Invalid password", [
-            "Old password is invalid",
-        ]);
+    if (!isPasswordValid) throw new ApiError(400, "Invalid password", ["Old password is invalid"]);
 
     //  IF THE PASSWORD IS VALID THEN UPDATE IT IN THE DATABASE
     user.password = newPassword;
     await user.save({ validateBeforeSave: false });
 
     // RETURN THE RESPONSE
-    return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "Password Changed sucessfully"));
+    return res.status(200).json(new ApiResponse(200, {}, "Password Changed sucessfully"));
 });
 
 // logout
@@ -176,10 +149,4 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "Logged out sucessfully"));
 });
 
-export {
-    registerUser,
-    loginUser,
-    refreshAccessToken,
-    changePassword,
-    logoutUser,
-};
+export { registerUser, loginUser, refreshAccessToken, changePassword, logoutUser };

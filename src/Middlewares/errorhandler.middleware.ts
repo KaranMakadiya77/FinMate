@@ -1,20 +1,14 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { ApiError } from "../Utils/apiError";
 
-const errorHandler: ErrorRequestHandler = (
-    err: Error,
-    _req: Request,
-    res: Response,
-    _next: NextFunction
-) => {
+const errorHandler: ErrorRequestHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
     if (err instanceof ApiError) {
         return res.status(err.statusCode).json({
             status: err.statusCode,
             success: err.success,
             message: err.message,
             errors: err.errors,
-            stack:
-                process.env.NODE_ENV === "development" ? err.stack : undefined,
+            stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
         });
     }
 

@@ -3,11 +3,7 @@ import jwt from "jsonwebtoken";
 import mongoose, { Schema } from "mongoose";
 import { IUser, IUserMethods } from "../Types/user.types";
 
-const userSchema = new Schema<
-    IUser,
-    mongoose.Model<IUser, {}, IUserMethods>,
-    IUserMethods
->(
+const userSchema = new Schema<IUser, mongoose.Model<IUser, {}, IUserMethods>, IUserMethods>(
     {
         name: {
             type: String,
@@ -77,14 +73,22 @@ userSchema.methods.isPasswordCorrect = async function (password: string) {
     return await bcrypt.compare(password, this.password);
 };
 
+userSchema.methods.updateBalance = async function (amount: number, type: "income" | "expense") {
+    if (type === "income") {
+        this.wallet_balance = this.wallet_balance + amount;
+    } else {
+        this.wallet_balance = this.wallet_balance - amount;
+    }
+    await this.save({ validateBeforeSave: false });
+};
+
 userSchema.methods.generateAccessToken = function () {
     const secret = process.env.ACCESS_TOKEN_SECRET as jwt.Secret | undefined;
     if (!secret) throw new Error("ACCESS_TOKEN_SECRET is not defined");
 
     const options: jwt.SignOptions = {};
     const expiresIn = process.env.ACCESS_TOKEN_EXPIRY;
-    if (expiresIn)
-        options.expiresIn = expiresIn as jwt.SignOptions["expiresIn"];
+    if (expiresIn) options.expiresIn = expiresIn as jwt.SignOptions["expiresIn"];
 
     return jwt.sign(
         {
@@ -102,8 +106,7 @@ userSchema.methods.generateRefreshToken = function () {
 
     const options: jwt.SignOptions = {};
     const expiresIn = process.env.REFRESH_TOKEN_EXPIRY;
-    if (expiresIn)
-        options.expiresIn = expiresIn as jwt.SignOptions["expiresIn"];
+    if (expiresIn) options.expiresIn = expiresIn as jwt.SignOptions["expiresIn"];
 
     return jwt.sign(
         {
@@ -125,7 +128,4 @@ userSchema.methods.generateAccessAndRefreshTokens = async function () {
     return { accessToken, refreshToken };
 };
 
-export const User = mongoose.model<
-    IUser,
-    mongoose.Model<IUser, {}, IUserMethods>
->("User", userSchema);
+export const User = mongoose.model<IUser, mongoose.Model<IUser, {}, IUserMethods>>("User", userSchema);

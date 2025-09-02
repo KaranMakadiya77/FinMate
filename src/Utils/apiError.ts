@@ -22,10 +22,7 @@ class ApiError extends Error {
             this.stack = stack;
         } else {
             // Optional chaining for environments where captureStackTrace may not exist
-            Error.captureStackTrace?.(
-                this,
-                this.constructor as unknown as Function
-            );
+            Error.captureStackTrace?.(this, this.constructor as unknown as Function);
         }
     }
 }

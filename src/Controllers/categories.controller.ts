@@ -14,14 +14,10 @@ const getCategories = asyncHandler(async (req, res) => {
 
     // Throw error if categories are not found
     if (!categories)
-        throw new ApiError(500, "Internal server error", [
-            "something went wrong while fetching categories",
-        ]);
+        throw new ApiError(500, "Internal server error", ["something went wrong while fetching categories"]);
 
     // return resposne
-    res.status(200).json(
-        new ApiResponse(200, categories, "categories fetched successfully")
-    );
+    res.status(200).json(new ApiResponse(200, categories, "categories fetched successfully"));
 });
 
 // add category
@@ -36,27 +32,19 @@ const addCategory = asyncHandler(async (req, res) => {
     if (!category) throw new ApiError(500, "Internal server error");
 
     // return response
-    res.status(201).json(
-        new ApiResponse(201, category, "category added successfully")
-    );
+    res.status(201).json(new ApiResponse(201, category, "category added successfully"));
 });
 
 // update category
 const updateCategory = asyncHandler(async (req, res) => {
     // update category
-    const category = await Category.findByIdAndUpdate(
-        req.category?._id,
-        req.body,
-        { new: true }
-    );
+    const category = await Category.findByIdAndUpdate(req.category?._id, req.body, { new: true });
 
     // Throw error
     if (!category) throw new ApiError(500, "Internal server error");
 
     // return response
-    res.status(201).json(
-        new ApiResponse(201, category, "category updated successfully")
-    );
+    res.status(201).json(new ApiResponse(201, category, "category updated successfully"));
 });
 
 // delete category
@@ -68,9 +56,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
     if (!deletedCategory) throw new ApiError(404, "Category not found !!");
 
     // return response
-    return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "Category deleted sucessfully !!"));
+    return res.status(200).json(new ApiResponse(200, {}, "Category deleted sucessfully !!"));
 });
 
 export { getCategories, addCategory, updateCategory, deleteCategory };
